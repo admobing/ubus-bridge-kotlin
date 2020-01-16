@@ -1,11 +1,13 @@
-#headers=libubus.h libubox/uloop.h libubox/ustream.h libubox/list.h libubox/blobmsg_json.h libubox/utils.h
+
 headers=./json-c/printbuf.h ./json-c/debug.h ./json-c/json_util.h ./json-c/json_config.h ./json-c/json.h ./json-c/json_c_version.h ./json-c/json_object_private.h ./json-c/arraylist.h ./json-c/linkhash.h ./json-c/json_tokener.h ./json-c/json_object_iterator.h ./json-c/json_inttypes.h ./json-c/bits.h ./json-c/json_object.h ./libubox/blobmsg_json.h ./libubox/usock.h ./libubox/utils.h ./libubox/blobmsg.h ./libubox/blob.h ./libubox/ulog.h ./libubox/md5.h ./libubox/kvlist.h ./libubox/json_script.h ./libubox/runqueue.h ./libubox/list.h ./libubox/safe_list.h ./libubox/avl.h ./libubox/uloop.h ./libubox/ustream.h ./libubox/vlist.h ./libubox/avl-cmp.h ./ubus_common.h ./ubusmsg.h ./libubus.h
 package=ubus
-compilerOpts=-I/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
-#staticLibraries =libubus.a libubox.a libblobmsg_json.a libjson.a libjson-c.a
-#libraryPaths=/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/lib
-linkerOpts = -L /Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/lib -ljson  -lubox -lubus -lblobmsg_json
-# /Users/mobing/Library/Android/android-ndk-r21/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=armv7-none-linux-androideabi19 --gcc-toolchain=/Users/mobing/Library/Android/android-ndk-r21/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/mobing/Library/Android/android-ndk-r21/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -Oz -DNDEBUG   -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id=sha1 -Wl,--fatal-warnings -Wl,--exclude-libs,libunwind.a -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections  CMakeFiles/server.dir/server.c.o CMakeFiles/server.dir/count.c.o  -o server  -L/Users/mobing/Desktop/ubus_android/stagdir/armeabi-v7a/lib ../libubus.so -lubox -lblobmsg_json -lc -latomic -lm
+
+#android
+#compilerOpts=-I/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
+#linkerOpts = -L /Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/lib -ljson  -lubox -lubus -lblobmsg_json
+#osx
+compilerOpts=-I/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubusosx/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
+linkerOpts = -L /Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubusosx/lib -ljson  -lubox -lubus -lblobmsg_json
 
 
 
