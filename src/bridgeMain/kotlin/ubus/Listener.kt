@@ -7,5 +7,5 @@ interface Listener {
     fun onInvokeCallback(success: Boolean, id: Long, rsp: String? = null, err: String? = null)
 
     fun onEventArrive(subscriber: String, method: String, payload: String)
-    
+
 }

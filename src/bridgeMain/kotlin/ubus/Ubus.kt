@@ -1,66 +1,60 @@
 package ubus
 
-import Log
+import Log.debug
+import Log.error
 import kotlinx.cinterop.*
 import platform.posix.sleep
 import kotlin.native.concurrent.*
 
 @SharedImmutable
 private val ubusCtx = AtomicReference<CPointer<ubus_context>?>(null)
-
 @SharedImmutable
-internal var configRef: COpaquePointer? = null
-
-@SharedImmutable
-var ubusListener: Listener? = null
+private val config = AtomicReference<Config?>(null)
 
 @ThreadLocal
-object Ubus {
+internal object Ubus {
+    fun run(path: String? = null, listener: Listener): Future<Unit> {
+        setConfig(Config(path, listener))
 
-    private var config: Config? = null
-
-    fun run(path: String? = null): Future<Unit> {
-        configRef = DetachedObjectGraph { Config(path) }.asCPointer()
         return Worker.start().execute(TransferMode.SAFE, {
-            configRef
         }) {
-            config = DetachedObjectGraph<Config>(it).attach()
             uloop_init()
-
-            val timer = nativeHeap.alloc<uloop_timeout> {
+            val timer = cValue<uloop_timeout> {
                 cb = staticCFunction { timer ->
                     initRuntimeIfNeeded()
 
                     registe()
                     uloop_timeout_set(timer, 2000)
                 }
-            }
-            uloop_timeout_set(timer.ptr, 2000)
+            }.getPointer(Arena())
+            uloop_timeout_set(timer, 2000)
 
             start()
-            Log.debug("uloop start")
+            debug("uloop start")
             uloop_run()
         }
     }
 
     private fun start() {
-        Log.debug("ubus connect ${config!!.server} ...")
-        val connect = ubus_connect(config!!.server)
+        val config = getConfig()
+        debug("ubus connect ${config.server} ...")
+        val connect = ubus_connect(config.server)
         if (connect == null) {
             restart()
             return
         }
 
-        Log.debug("ubus connect success")
+        debug("ubus connect success")
         connect.pointed.connection_lost = staticCFunction { _ ->
             initRuntimeIfNeeded()
 
-            Log.debug("ubus disconnect")
+            debug("ubus disconnect")
 
-            config!!.subscribers.forEach {
+            val config = getConfig()
+            config.subscribers.forEach {
                 it.onLeave()
             }
-            config!!.providers.forEach {
+            config.providers.forEach {
                 it.onLeave()
             }
 
@@ -80,18 +74,19 @@ object Ubus {
     }
 
     fun stop() {
-        ubusCtx.value?.let {
-            ubus_free(it)
+        val ctx = ubusCtx.value
+        if (ctx != null) {
             ubusCtx.value = null
+            ubus_free(ctx)
         }
     }
 
     private fun registe(connect: CPointer<ubus_context>? = null) {
-        config!!.subscribers.forEach {
+        val config = getConfig()
+        config.subscribers.forEach {
             registerSubscriberInner(it, connect)
         }
-
-        config!!.providers.forEach {
+        config.providers.forEach {
             registerProviderInner(it, connect)
         }
     }
@@ -177,18 +172,17 @@ object Ubus {
     }
 
     fun registerProvider(provider: Provider, ctx: CPointer<ubus_context>? = null): Int {
-        if (config == null) {
-            config = DetachedObjectGraph<Config>(configRef).attach()
-        }
-        config!!.providers.add(provider)
+        val config = getConfig().copy()
+        config.providers.add(provider)
+        setConfig(config)
+
         return registerProviderInner(provider, ctx)
     }
 
     fun registerSubscriber(subscriber: Subscriber, ctx: CPointer<ubus_context>? = null): Int {
-        if (config == null) {
-            config = DetachedObjectGraph<Config>(configRef).attach()
-        }
-        config!!.subscribers.add(subscriber)
+        val config = getConfig().copy()
+        config.subscribers.add(subscriber)
+        setConfig(config)
 
         return registerSubscriberInner(subscriber, ctx)
     }
@@ -196,7 +190,7 @@ object Ubus {
     fun invoke(obj: String, method: String, payload: String): Long {
         val ctx = ubusCtx.value
         if (ctx == null) {
-            Log.debug("rsp err ctx not ready")
+            debug("rsp err ctx not ready")
             return 0
         }
 
@@ -206,31 +200,38 @@ object Ubus {
     fun rsp(reqId: Long, payload: String) {
         val ctx = ubusCtx.value
         if (ctx == null) {
-            Log.debug("rsp err ctx not ready")
+            debug("rsp err ctx not ready")
             return
         }
-        if (config == null) {
-            config = DetachedObjectGraph<Config>(configRef).attach()
-        }
-        config!!.providers.forEach {
+
+        val config = getConfig()
+        config.providers.forEach {
             if (it.rsp(ctx, reqId, payload)) {
                 return
             }
         }
     }
 
-    fun findProviderById(oid: UInt): Provider? {
-        if (config == null) {
-            config = DetachedObjectGraph<Config>(configRef).attach()
-        }
-        return config!!.providers.find { it.getUbusId() == oid }
+    internal fun findProviderById(oid: UInt): Provider? {
+        val config = getConfig()
+        return config.providers.find { it.getUbusId() == oid }
     }
 
-    fun findSubscriberById(oid: UInt): Subscriber? {
-        if (config == null) {
-            config = DetachedObjectGraph<Config>(configRef).attach()
-        }
-        return config!!.subscribers.find { it.getUbusId() == oid }
+    internal fun findSubscriberById(oid: UInt): Subscriber? {
+        val config = getConfig()
+        return config.subscribers.find { it.getUbusId() == oid }
     }
 
+    private fun setConfig(cfg: Config) {
+        config.value = cfg.freeze()
+    }
+
+}
+
+fun getUbusListener(): Listener {
+    return getConfig().listener
+}
+
+internal fun getConfig(): Config {
+    return config.value!!
 }

@@ -11,25 +11,43 @@ repositories {
     }
 }
 kotlin {
-//     androidNativeArm32("bridge") {
-//         compilations.main {
-//             cinterops {
-//                 ubus
-//             }
-//             dependencies {
-//                 implementation files('/Users/mobing/Work/hzgj/ubus-bridge/libs/androidArm32/kotlinx-serialization-runtime.klib')
-//             }
-//         }
-//         binaries {
-//             sharedLib {
-//                 baseName="ubusbridge"
-//             }
-//         }
-//     }
     macosX64("bridge"){
         compilations.main {
             cinterops {
-                ubus
+                ubus{
+                    defFile 'src/nativeInterop/cinterop/ubusosx.def'
+                }
+            }
+            dependencies {
+                implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0"
+            }
+        }
+    }
+
+    androidNativeArm32("android"){
+        compilations.main {
+            cinterops {
+                ubus{
+                    defFile 'src/nativeInterop/cinterop/ubus.def'
+                }
+            }
+            dependencies {
+                implementation files('/Users/mobing/Work/hzgj/ubus-bridge/libs/androidArm32/kotlinx-serialization-runtime.klib')
+            }
+        }
+        binaries {
+            sharedLib {
+                baseName="ubusbridge"
+            }
+        }
+    }
+
+    macosX64("macos"){
+        compilations.main {
+            cinterops {
+                ubus{
+                    defFile 'src/nativeInterop/cinterop/ubusosx.def'
+                }
             }
             dependencies {
                 implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0"
@@ -39,23 +57,25 @@ kotlin {
             executable{}
         }
     }
-//     sourceSets{
-//        bridgeosxMain{
-//             dependencies {
-//                 implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0"
-//             }
-//         }
-//         macosX64.dependsOn(bridgeosxMain)
-//         bridgeMain{
-//             dependencies {
-//                 files '/Users/mobing/Work/hzgj/ubus-bridge/libs/androidArm32/kotlinx-serialization-runtime.klib'
-//             }
-//         }
-//     }
+
+    sourceSets{
+       commonMain{}
+       bridgeMain{
+         dependsOn commonMain
+       }
+
+       macosMain{
+        dependsOn(bridgeMain)
+       }
+       androidMain{
+//         dependsOn commonMain
+        dependsOn(bridgeMain)
+       }
+    }
 }
 
 task install(type:Copy) {
-    from './build/bin/bridge/releaseShared/libubusbridge.so'
+    from './build/bin/android/releaseShared'
     into "/Users/mobing/Work/hzgj/hzgj-app/app/libs/armeabi-v7a"
 }
 

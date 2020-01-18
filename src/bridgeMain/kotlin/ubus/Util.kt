@@ -6,7 +6,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.content
 import kotlinx.serialization.json.int
 
-fun buildUbusParam(payload: String, buf: CValuesRef<blob_buf>) {
+internal fun buildUbusParam(payload: String, buf: CValuesRef<blob_buf>) {
     Json(JsonConfiguration.Stable).parseJson(payload).jsonArray.forEach {
         val param = it.jsonObject.content
         val name = param["name"]!!.content
