@@ -5,7 +5,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    jcenter()
     maven {
         url 'https://dl.bintray.com/kotlin/kotlinx/'
     }
@@ -32,7 +31,7 @@ kotlin {
                 }
             }
             dependencies {
-                implementation files('/Users/mobing/Work/hzgj/ubus-bridge/libs/androidArm32/kotlinx-serialization-runtime.klib')
+                implementation files('/Users/mobingad/work/ubus-bridge/libs/androidArm32/kotlinx-serialization-runtime.klib')
             }
         }
         binaries {
@@ -68,7 +67,6 @@ kotlin {
         dependsOn(bridgeMain)
        }
        androidMain{
-//         dependsOn commonMain
         dependsOn(bridgeMain)
        }
     }

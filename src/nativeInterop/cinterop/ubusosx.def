@@ -6,8 +6,8 @@ package=ubus
 #compilerOpts=-I/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
 #linkerOpts = -L /Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubus/lib -ljson  -lubox -lubus -lblobmsg_json
 #osx
-compilerOpts=-I/Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubusosx/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
-linkerOpts = -L /Users/mobing/Work/hzgj/ubus-bridge/src/nativeInterop/cinterop/ubusosx/lib -ljson  -lubox -lubus -lblobmsg_json
+compilerOpts=-I/Users/mobingad/work/ubus-bridge/src/nativeInterop/cinterop/ubusosx/include/  -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
+linkerOpts = -L /Users/mobingad/work/ubus-bridge/src/nativeInterop/cinterop/ubusosx/lib -ljson  -lubox -lubus -lblobmsg_json
 
 
 
