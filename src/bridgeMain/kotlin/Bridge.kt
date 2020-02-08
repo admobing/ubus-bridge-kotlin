@@ -1,7 +1,7 @@
 import ubus.*
 
 object Bridge {
-    fun start(server: String? = null, onRequestArrive: (provider: String, method: String, payload: String, id: Long) -> Unit, onInvokeCallback: (success: Boolean, id: Long, rsp: String?, err: String?) -> Unit, onNotifyArrive: (subscriber: String, method: String, payload: String) -> Unit, onEventArrive: (type: String, payload: String) -> Unit) {
+    fun start(server: String? = null, onRequestArrive: (provider: String, method: String, payload: String, id: Long) -> Unit, onInvokeCallback: (success: Boolean, id: Long, rsp: String?, err: String?) -> Unit, onNotifyArrive: (subscriber: String, method: String, payload: String) -> Unit, onEventArrive: (listener: String, type: String, payload: String) -> Unit) {
         val listener = object : Listener {
             override fun onRequestArrive(provider: String, method: String, payload: String, id: Long) {
                 onRequestArrive(provider, method, payload, id)
@@ -11,8 +11,8 @@ object Bridge {
                 onInvokeCallback(success, id, rsp, err)
             }
 
-            override fun onEventArrive(type: String, payload: String) {
-                onEventArrive(type, payload)
+            override fun onEventArrive(listener: String, type: String, payload: String) {
+                onEventArrive(listener, type, payload)
             }
 
             override fun onNotifyArrive(subscriber: String, method: String, payload: String) {

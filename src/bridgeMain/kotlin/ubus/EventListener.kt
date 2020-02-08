@@ -11,11 +11,13 @@ internal class EventListener(val name: String, val path: String, private val reg
                 initRuntimeIfNeeded()
 
                 val payload = blobmsg_format_json(msg, true)!!.toKString()
-                type!!.toKString()
-
-                getUbusListener().onEventArrive(type!!.toKString(), payload)
+                Ubus.findEventListenerById(ev!!.pointed.obj.id)?.onEventArrive(type!!.toKString(), payload)
             }
         }.ptr
+    }
+
+    fun onEventArrive(type: String, payload: String) {
+        getUbusListener().onEventArrive(name, type, payload)
     }
 
     fun toBus(): CPointer<ubus_event_handler> {

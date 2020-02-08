@@ -231,7 +231,7 @@ internal object Ubus {
             debug("rsp err ctx not ready")
             return
         }
-        
+
         Provider.rsp(ctx, reqId, payload)
     }
 
@@ -273,6 +273,11 @@ internal object Ubus {
     internal fun findSubscriberById(oid: UInt): Subscriber? {
         val config = getConfig()
         return config.subscribers.find { it.getUbusId() == oid }
+    }
+
+    internal fun findEventListenerById(oid: UInt): EventListener? {
+        val config = getConfig()
+        return config.eventListeners.find { it.getUbusId() == oid }
     }
 
     private fun setConfig(cfg: Config) {

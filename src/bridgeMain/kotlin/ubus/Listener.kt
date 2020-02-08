@@ -6,7 +6,7 @@ interface Listener {
 
     fun onInvokeCallback(success: Boolean, id: Long, rsp: String? = null, err: String? = null)
 
-    fun onEventArrive(type: String, payload: String)
+    fun onEventArrive(listener:String,type: String, payload: String)
 
     fun onNotifyArrive(subscriber: String, method: String, payload: String)
 
