@@ -1,6 +1,10 @@
-import platform.android.*
 import kotlinx.cinterop.CPointer
 import kotlinx.serialization.ImplicitReflectionSerializer
+import platform.android.JNIEnvVar
+import platform.android.jclass
+import platform.android.jlong
+import platform.android.jstring
+import ubus.uloop_run
 import kotlin.native.concurrent.freeze
 
 @SharedImmutable
@@ -17,7 +21,7 @@ fun load(env: CPointer<JNIEnvVar>, cls: jclass, server: jstring?) = jniWith(env)
     onRequestArrive = getStaticMethodID(cls, "onRequestArrive", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V")!!.freeze()
     onInvokeCallback = getStaticMethodID(cls, "onInvokeCallback", "(ZJLjava/lang/String;Ljava/lang/String;)V")!!.freeze()
     onNotifyArrive = getStaticMethodID(cls, "onNotifyArrive", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")!!.freeze()
-    onEventArrive = getStaticMethodID(cls, "onEventArrive", "(Ljava/lang/String;Ljava/lang/String;)V")!!.freeze()
+    onEventArrive = getStaticMethodID(cls, "onEventArrive", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")!!.freeze()
 
     Bridge.start(server?.asKString(), { provider, method, payload, id ->
         jniWith(env) {
@@ -31,9 +35,9 @@ fun load(env: CPointer<JNIEnvVar>, cls: jclass, server: jstring?) = jniWith(env)
         jniWith(env) {
             callStaticVoidMethod(cls, onNotifyArrive, subscriber, method, payload)
         }
-    }, { type, payload ->
+    }, { listener, type, payload ->
         jniWith(env) {
-            callStaticVoidMethod(cls, onEventArrive, type, payload)
+            callStaticVoidMethod(cls, onEventArrive, listener, type, payload)
         }
     })
 }
@@ -72,4 +76,9 @@ fun notify(env: CPointer<JNIEnvVar>, cls: jclass, provider: jstring, type: jstri
 @CName("Java_com_wthink_ubus_UbusBridge_sendEvent")
 fun sendEvent(env: CPointer<JNIEnvVar>, cls: jclass, event: jstring, payload: jstring) = jniWith(env) {
     Bridge.sendEvent(event.asKString()!!, payload.asKString()!!)
+}
+
+@CName("Java_com_wthink_ubus_UbusBridge_loop")
+fun loop(env: CPointer<JNIEnvVar>, cls: jclass) {
+    uloop_run()
 }
