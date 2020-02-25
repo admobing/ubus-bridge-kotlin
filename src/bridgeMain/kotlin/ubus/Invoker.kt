@@ -2,7 +2,7 @@ package ubus
 
 import Log.debug
 import kotlinx.cinterop.*
-import kotlin.native.concurrent.AtomicLong
+import kotlin.native.concurrent.AtomicInt
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 
@@ -10,7 +10,7 @@ import kotlin.native.concurrent.freeze
 internal val idCache = AtomicReference<MutableMap<String, UInt>>(hashMapOf<String, UInt>().freeze())
 
 @SharedImmutable
-internal val reqCounter = AtomicLong()
+internal val reqCounter = AtomicInt(0)
 
 
 @ThreadLocal

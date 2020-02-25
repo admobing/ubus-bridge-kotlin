@@ -15,7 +15,7 @@ internal class ProviderRequest(val req: CValuesRef<ubus_request_data>, val arena
 }
 
 @SharedImmutable
-internal val provideCounter = AtomicLong()
+internal val provideCounter = AtomicInt(0)
 
 @SharedImmutable
 internal val providerWorker = Worker.start()
